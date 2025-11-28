@@ -1,181 +1,185 @@
-# M5Stack PaperS3 Wetter-Display Anleitung
+# M5Stack PaperS3 Weather Display Guide
 
-Komplette Anleitung zum Einrichten eines Wetter-Displays auf dem M5Stack PaperS3 mit ESPHome und Home Assistant.
+Complete guide for setting up a weather display on the M5Stack PaperS3 with ESPHome and Home Assistant.
 
-## 📋 Voraussetzungen
+## 📋 Prerequisites
 
 - M5Stack PaperS3 E-Ink Display
-- Home Assistant Installation mit funktionierender Wetter-Integration
-- ESPHome installiert und konfiguriert
-- Python 3.x für Icon-Generierung
+- Home Assistant installation with working weather integration
+- ESPHome installed and configured
+- Python 3.x for icon generation
 
-## 🚀 Schnellstart
+## 🚀 Quick Start
 
-### Schritt 1: Wetter-Icons generieren
+### Step 1: Generate Weather Icons
 
 ```bash
-# In das Scripts-Verzeichnis wechseln
+# Change to scripts directory
 cd c:\Users\btrom\source\repos\epdiy\scripts
 
-# Icons generieren und konvertieren
+# Generate and convert icons
 python download_weather_icons.py
 ```
 
-Dies erstellt:
-- PNG-Icons in `scripts/weather_icons/`
-- Header-Datei `weather_icons.h` im epdiy-Root-Verzeichnis
+This creates:
 
-### Schritt 2: Icons zu ESPHome kopieren
+- PNG icons in `scripts/weather_icons/`
+- Header file `weather_icons.h` in epdiy root directory
+
+### Step 2: Copy Icons to ESPHome
 
 ```bash
-# Icons in ESPHome-Konfigurationsverzeichnis kopieren
+# Copy icons to ESPHome configuration directory
 copy ..\weather_icons.h c:\Users\btrom\source\repos\esphome_components\
 ```
 
-### Schritt 3: ESPHome-Konfiguration anpassen
+### Step 3: Adjust ESPHome Configuration
 
-Öffne `m5stack-papers3-weather.yaml` und passe folgende Werte an:
+Open `m5stack-papers3-weather.yaml` and adjust these values:
 
-#### 3.1 WiFi-Zugangsdaten
+#### 3.1 WiFi Credentials
 
-Erstelle/bearbeite `secrets.yaml` in deinem ESPHome-Verzeichnis:
+Create/edit `secrets.yaml` in your ESPHome directory:
 
 ```yaml
-wifi_ssid: "DeinWiFi-Name"
-wifi_password: "DeinWiFi-Passwort"
+wifi_ssid: "YourWiFiName"
+wifi_password: "YourWiFiPassword"
 ```
 
-#### 3.2 Wetter-Entitäten
+#### 3.2 Weather Entities
 
-Ersetze die Platzhalter mit deinen echten Home Assistant Entitäten:
+Replace placeholders with your actual Home Assistant entities:
 
 ```yaml
 sensor:
   - platform: homeassistant
     id: weather_temperature
-    entity_id: weather.home  # ← HIER ANPASSEN
+    entity_id: weather.home  # ← ADJUST HERE
 
   - platform: homeassistant
     id: outdoor_temperature
-    entity_id: sensor.outdoor_temperature  # ← HIER ANPASSEN
+    entity_id: sensor.outdoor_temperature  # ← ADJUST HERE
 ```
 
-**So findest du deine Entitäten:**
+**How to find your entities:**
 
-1. Öffne Home Assistant
-2. Gehe zu Entwicklerwerkzeuge → Zustände
-3. Suche nach deiner Wetter-Integration (z.B. `weather.home`, `weather.openweathermap`)
-4. Suche nach Temperatur-Sensoren (z.B. `sensor.garten_temperature`)
+1. Open Home Assistant
+2. Go to Developer Tools → States
+3. Search for your weather integration (e.g., `weather.home`, `weather.openweathermap`)
+4. Search for temperature sensors (e.g., `sensor.garden_temperature`)
 
-#### 3.3 Zeitzone
+#### 3.3 Timezone
 
 ```yaml
 time:
   - platform: homeassistant
     id: ha_time
-    timezone: Europe/Berlin  # ← HIER ANPASSEN (z.B. Europe/Vienna, Europe/Zurich)
+    timezone: Europe/Berlin  # ← ADJUST HERE (e.g., Europe/Vienna, Europe/Zurich)
 ```
 
-### Schritt 4: Firmware kompilieren und flashen
+### Step 4: Compile and Flash Firmware
 
 ```bash
-# ESPHome-Firmware kompilieren
+# Compile ESPHome firmware
 esphome compile m5stack-papers3-weather.yaml
 
-# Firmware hochladen (beim ersten Mal per USB)
+# Upload firmware (first time via USB)
 esphome upload m5stack-papers3-weather.yaml
 ```
 
-**Beim ersten Mal:**
-- Verbinde M5Paper per USB
-- Wähle den COM-Port aus
-- Warte auf Upload-Abschluss (~5 Minuten)
+**First time:**
 
-**Danach:** Over-The-Air (OTA) Updates möglich!
+- Connect M5Paper via USB
+- Select COM port
+- Wait for upload completion (~5 minutes)
 
-### Schritt 5: In Home Assistant integrieren
+**After that:** Over-The-Air (OTA) updates possible!
 
-1. Home Assistant sollte das Gerät automatisch erkennen
-2. Gehe zu Einstellungen → Geräte & Dienste → Integrationen
-3. Klicke auf "M5Paper Weather Display"
-4. Konfiguration abschließen
+### Step 5: Integrate in Home Assistant
 
-## 🎨 Anpassungen
+1. Home Assistant should automatically discover the device
+2. Go to Settings → Devices & Services → Integrations
+3. Click on "M5Paper Weather Display"
+4. Complete configuration
 
-### Display-Layout ändern
+## 🎨 Customizations
 
-Öffne `m5stack-papers3-weather.yaml` und bearbeite den `lambda`-Bereich im Display-Abschnitt:
+### Change Display Layout
+
+Open `m5stack-papers3-weather.yaml` and edit the `lambda` section in the display section:
 
 ```yaml
 display:
   - platform: ed047tc1
     lambda: |-
-      // Hier kannst du Positionen, Schriftgrößen, etc. ändern
+      // Here you can change positions, font sizes, etc.
       it.printf(x, y, id(font), "Text");
 ```
 
-### Weitere Wetter-Daten anzeigen
+### Add More Weather Data
 
-Füge zusätzliche Sensoren hinzu:
+Add additional sensors:
 
 ```yaml
 sensor:
-  # UV-Index
+  # UV Index
   - platform: homeassistant
     id: weather_uv_index
     entity_id: sensor.uv_index
 
-  # Niederschlagsmenge
+  # Precipitation
   - platform: homeassistant
     id: weather_precipitation
     entity_id: sensor.precipitation
 ```
 
-Dann im Display-Lambda:
+Then in display lambda:
 
 ```yaml
-// UV-Index anzeigen
+// Display UV index
 if (id(weather_uv_index).has_state()) {
   it.printf(100, 600, id(font_medium), "UV: %.0f", id(weather_uv_index).state);
 }
 ```
 
-### Update-Intervalle anpassen
+### Adjust Update Intervals
 
 ```yaml
 interval:
-  # Häufigere Updates (mehr Batterieverbrauch)
-  - interval: 10min  # statt 6h
+  # More frequent updates (more battery consumption)
+  - interval: 10min  # instead of 6h
     then:
       - component.update: weather_display
 ```
 
-**Empfohlene Intervalle:**
-- **6 Stunden**: Normaler Betrieb, schont Batterie
-- **1 Stunde**: Häufigere Updates bei schnellen Wetteränderungen
-- **15 Minuten**: Maximale Aktualität (höherer Stromverbrauch)
+**Recommended intervals:**
 
-### Eigene Wetter-Icons verwenden
+- **6 hours**: Normal operation, saves battery
+- **1 hour**: More frequent updates for rapid weather changes
+- **15 minutes**: Maximum freshness (higher power consumption)
 
-1. Erstelle 128x128 PNG-Bilder für jede Wetterbedingung
-2. Speichere sie in `epdiy/scripts/weather_icons/`
-3. Benenne sie wie die bestehenden Icons:
+### Use Custom Weather Icons
+
+1. Create 128x128 PNG images for each weather condition
+2. Save them in `epdiy/scripts/weather_icons/`
+3. Name them like existing icons:
    - `sunny.png`
    - `cloudy.png`
    - `rainy.png`
    - etc.
-4. Führe `download_weather_icons.py` erneut aus
+4. Run `download_weather_icons.py` again
 
-**Icon-Quellen:**
+**Icon sources:**
+
 - [Material Design Icons](https://materialdesignicons.com/)
 - [Weather Icons](https://erikflowers.github.io/weather-icons/)
 - [Flaticon Weather](https://www.flaticon.com/search?word=weather)
 
-## 🔧 Erweiterte Konfiguration
+## 🔧 Advanced Configuration
 
-### Batterie-Management optimieren
+### Optimize Battery Management
 
-Deep Sleep aktivieren (extrem lange Batterie-Laufzeit):
+Enable deep sleep (extremely long battery life):
 
 ```yaml
 esphome:
@@ -188,36 +192,36 @@ esphome:
 deep_sleep:
   id: deep_sleep_control
   run_duration: 10s
-  sleep_duration: 30min  # Wacht alle 30 Min auf
+  sleep_duration: 30min  # Wake up every 30 min
 ```
 
-**Achtung:** Im Deep Sleep ist keine OTA-Aktualisierung möglich!
+**Warning:** OTA updates are not possible in deep sleep!
 
-### Touch-Steuerung erweitern
+### Extend Touch Control
 
 ```yaml
 touchscreen:
   on_touch:
     - lambda: |-
-        // Obere Hälfte: Display aktualisieren
+        // Upper half: Update display
         if (touch.y < 480) {
           id(weather_display).update();
         }
-        // Untere Hälfte: Ton abspielen
+        // Lower half: Play tone
         else {
           id(buzzer).play("beep:d=4,o=5,b=100:16e6");
         }
 ```
 
-### Home Assistant Automationen
+### Home Assistant Automations
 
-#### Automatisches Update bei Wetteränderung
+#### Automatic Update on Weather Change
 
 In Home Assistant `automations.yaml`:
 
 ```yaml
 automation:
-  - alias: "M5Paper: Update bei Wetteränderung"
+  - alias: "M5Paper: Update on Weather Change"
     trigger:
       - platform: state
         entity_id: weather.home
@@ -225,11 +229,11 @@ automation:
       - service: esphome.m5papers3_weather_update_display
 ```
 
-#### Warnung bei extremem Wetter
+#### Warning on Severe Weather
 
 ```yaml
 automation:
-  - alias: "M5Paper: Unwetterwarnung"
+  - alias: "M5Paper: Severe Weather Warning"
     trigger:
       - platform: state
         entity_id: weather.home
@@ -243,10 +247,10 @@ automation:
           rtttl_string: "alarm:d=4,o=5,b=140:16c6,16c6,16c6,8p"
       - service: notify.mobile_app
         data:
-          message: "Unwetterwarnung auf M5Paper angezeigt!"
+          message: "Severe weather warning displayed on M5Paper!"
 ```
 
-## 📊 Wetter-Integration Beispiele
+## 📊 Weather Integration Examples
 
 ### OpenWeatherMap
 
@@ -258,7 +262,7 @@ weather:
     mode: freedaily
 ```
 
-### Met.no (kostenlos, keine API-Key nötig)
+### Met.no (free, no API key needed)
 
 ```yaml
 weather:
@@ -275,85 +279,85 @@ weather:
     mode: daily
 ```
 
-## 🐛 Fehlerbehebung
+## 🐛 Troubleshooting
 
-### Display zeigt nichts an
+### Display Shows Nothing
 
-1. **Log prüfen:**
+1. **Check log:**
    ```bash
    esphome logs m5stack-papers3-weather.yaml
    ```
 
-2. **Display-Pins überprüfen:**
-   - Sind alle Pin-Definitionen korrekt?
-   - Siehe Hardware-Spezifikation im YAML
+2. **Verify display pins:**
+   - Are all pin definitions correct?
+   - See hardware specification in YAML
 
-3. **Stromversorgung:**
-   - Ist die Batterie geladen?
-   - Funktioniert USB-Stromversorgung?
+3. **Power supply:**
+   - Is battery charged?
+   - Does USB power work?
 
-### Icons werden nicht angezeigt
+### Icons Not Displayed
 
-1. **Header-Datei vorhanden?**
+1. **Header file present?**
    ```bash
    dir c:\Users\btrom\source\repos\esphome_components\weather_icons.h
    ```
 
-2. **Includes richtig gesetzt?**
+2. **Includes correctly set?**
    ```yaml
    esphome:
      includes:
        - weather_icons.h
    ```
 
-3. **Kompilierung neu versuchen:**
+3. **Retry compilation:**
    ```bash
    esphome clean m5stack-papers3-weather.yaml
    esphome compile m5stack-papers3-weather.yaml
    ```
 
-### Wetter-Daten nicht verfügbar
+### Weather Data Not Available
 
-1. **Home Assistant Verbindung:**
-   - Ist API in ESPHome aktiviert?
-   - Ist das Gerät mit WiFi verbunden?
+1. **Home Assistant connection:**
+   - Is API enabled in ESPHome?
+   - Is device connected to WiFi?
 
-2. **Entitäten prüfen:**
+2. **Check entities:**
    ```yaml
-   # Im Log erscheinen Warnungen bei falschen Entitäten
+   # Warnings appear in log for wrong entities
    sensor:
      - platform: homeassistant
-       entity_id: weather.FALSCHE_ENTITAET  # ← Fehler im Log
+       entity_id: weather.WRONG_ENTITY  # ← Error in log
    ```
 
-3. **Sensoren in HA überprüfen:**
-   - Entwicklerwerkzeuge → Zustände
-   - Sind die Wetter-Entitäten verfügbar?
+3. **Verify sensors in HA:**
+   - Developer Tools → States
+   - Are weather entities available?
 
-### Hoher Batterieverbrauch
+### High Battery Consumption
 
-1. **Update-Intervall reduzieren:**
+1. **Reduce update interval:**
    ```yaml
    interval:
-     - interval: 6h  # statt 15min
+     - interval: 6h  # instead of 15min
    ```
 
-2. **WiFi Power-Save aktivieren:**
+2. **Enable WiFi power save:**
    ```yaml
    wifi:
      power_save_mode: LIGHT
    ```
 
-3. **Deep Sleep verwenden:**
-   Siehe "Batterie-Management" oben
+3. **Use deep sleep:**
+   See "Battery Management" above
 
-## 📱 Services für Home Assistant
+## 📱 Services for Home Assistant
 
-Das Display registriert folgende Services:
+The display registers these services:
 
 ### `esphome.m5papers3_weather_update_display`
 
-Aktualisiert das Display manuell.
+Updates display manually.
 
 ```yaml
 service: esphome.m5papers3_weather_update_display
@@ -361,7 +365,7 @@ service: esphome.m5papers3_weather_update_display
 
 ### `esphome.m5papers3_weather_play_tone`
 
-Spielt einen RTTTL-Ton ab.
+Plays an RTTTL tone.
 
 ```yaml
 service: esphome.m5papers3_weather_play_tone
@@ -369,16 +373,17 @@ data:
   rtttl_string: "scale:d=4,o=5,b=100:c,d,e,f,g,a,b,c6"
 ```
 
-**RTTTL-Beispiele:**
+**RTTTL examples:**
+
 - Alarm: `alarm:d=4,o=5,b=140:16c6,16c6,16c6`
-- Melodie: `melody:d=4,o=5,b=125:16e,16e,16f,16g,16g,16f,16e,16d`
+- Melody: `melody:d=4,o=5,b=125:16e,16e,16f,16g,16g,16f,16e,16d`
 - Star Wars: `StarWars:d=4,o=5,b=45:32p,32f#,32f#,32f#,8b.,8f#.6,32e6,32d#6,32c#6,8b.6`
 
-## 🎯 Nächste Schritte
+## 🎯 Next Steps
 
-### Grafische Vorhersage
+### Graphical Forecast
 
-Füge eine 3-Tages-Vorhersage mit Icons hinzu:
+Add 3-day forecast with icons:
 
 ```yaml
 text_sensor:
@@ -393,13 +398,13 @@ text_sensor:
     attribute: forecast[1].condition
 ```
 
-### Historische Daten / Graphen
+### Historical Data / Graphs
 
-Zeichne Temperatur-Verlauf als Liniengrafik:
+Draw temperature history as line graph:
 
 ```yaml
 lambda: |-
-  // Beispiel: Einfacher Temperatur-Graph
+  // Example: Simple temperature graph
   std::vector<float> temps = {20.5, 21.0, 22.3, 23.1, 22.8};
   for (int i = 0; i < temps.size() - 1; i++) {
     int x1 = 50 + i * 100;
@@ -410,9 +415,9 @@ lambda: |-
   }
 ```
 
-### Multi-Standort Wetter
+### Multi-Location Weather
 
-Zeige Wetter für mehrere Orte:
+Show weather for multiple locations:
 
 ```yaml
 sensor:
@@ -421,26 +426,26 @@ sensor:
     entity_id: weather.berlin
 
   - platform: homeassistant
-    id: weather_muenchen
-    entity_id: weather.muenchen
+    id: weather_munich
+    entity_id: weather.munich
 ```
 
-## 📚 Ressourcen
+## 📚 Resources
 
-- [EPDiy Dokumentation](https://github.com/vroland/epdiy)
-- [ESPHome Dokumentation](https://esphome.io/)
-- [Home Assistant Wetter-Integrationen](https://www.home-assistant.io/integrations/#weather)
+- [EPDiy Documentation](https://github.com/vroland/epdiy)
+- [ESPHome Documentation](https://esphome.io/)
+- [Home Assistant Weather Integrations](https://www.home-assistant.io/integrations/#weather)
 - [M5Stack PaperS3 Hardware](https://docs.m5stack.com/en/core/PaperS3)
 - [RTTTL Ringtone Format](https://en.wikipedia.org/wiki/Ring_Tone_Transfer_Language)
 
 ## 🤝 Support
 
-Bei Problemen oder Fragen:
+For problems or questions:
 
-1. Überprüfe die Logs: `esphome logs m5stack-papers3-weather.yaml`
-2. Schaue in die [ESPHome Community](https://community.home-assistant.io/c/esphome)
-3. Prüfe die [epdiy Issues](https://github.com/vroland/epdiy/issues)
+1. Check logs: `esphome logs m5stack-papers3-weather.yaml`
+2. Look in [ESPHome Community](https://community.home-assistant.io/c/esphome)
+3. Check [epdiy Issues](https://github.com/vroland/epdiy/issues)
 
-## 📄 Lizenz
+## 📄 License
 
-Diese Anleitung und die Beispiel-Konfiguration sind unter MIT-Lizenz verfügbar.
+This guide and example configuration are available under MIT License.

@@ -1,46 +1,46 @@
-# 🌤️ M5Stack PaperS3 Wetter-Display
+# 🌤️ M5Stack PaperS3 Weather Display
 
-Komplettes Wetter-Display für M5Stack PaperS3 mit OpenWeatherMap Integration.
+Complete weather display for M5Stack PaperS3 with OpenWeatherMap integration.
 
-## 📁 Dateien
+## 📁 Files
 
-| Datei | Beschreibung |
+| File | Description |
 |-------|-------------|
-| [m5stack-papers3-weather.yaml](m5stack-papers3-weather.yaml) | **Haupt-Konfiguration** - Fertig für OpenWeatherMap |
-| [OPENWEATHERMAP_SETUP.md](OPENWEATHERMAP_SETUP.md) | **⭐ START HIER** - Setup-Anleitung für OpenWeatherMap |
-| [WEATHER_QUICKSTART.md](WEATHER_QUICKSTART.md) | 5-Minuten Schnellstart |
-| [WEATHER_DISPLAY_GUIDE.md](WEATHER_DISPLAY_GUIDE.md) | Vollständige Anleitung |
-| `weather_icons.h` | Generierte Wetter-Icons (wird erstellt) |
-| `secrets.yaml` | WiFi-Zugangsdaten (musst du erstellen) |
+| [m5stack-papers3-weather.yaml](m5stack-papers3-weather.yaml) | **Main Configuration** - Ready for OpenWeatherMap |
+| [OPENWEATHERMAP_SETUP.md](OPENWEATHERMAP_SETUP.md) | **⭐ START HERE** - Setup guide for OpenWeatherMap |
+| [WEATHER_DISPLAY_GUIDE.md](WEATHER_DISPLAY_GUIDE.md) | Complete guide |
+| `weather_icons.h` | Generated weather icons (will be created) |
+| `secrets.yaml` | WiFi credentials (you need to create this) |
 
-## ⚡ 2-Minuten Setup
+## ⚡ 2-Minute Setup
 
 ```bash
-# 1. Icons generieren
+# 1. Generate icons
 cd /c/Users/btrom/source/repos/epdiy/scripts
 python download_weather_icons.py
 copy ..\weather_icons.h ..\..\esphome_components\
 
-# 2. Secrets erstellen
+# 2. Create secrets
 cd /c/Users/btrom/source/repos/esphome_components
-echo "wifi_ssid: \"DeinWiFi\"" > secrets.yaml
-echo "wifi_password: \"DeinPasswort\"" >> secrets.yaml
+echo "wifi_ssid: \"YourWiFi\"" > secrets.yaml
+echo "wifi_password: \"YourPassword\"" >> secrets.yaml
 
-# 3. Flashen
+# 3. Flash
 esphome run m5stack-papers3-weather.yaml
 ```
 
-**Fertig!** Das Display zeigt jetzt:
-- 🌡️ Aktuelle Temperatur & Gefühlte Temperatur
-- 💧 Luftfeuchtigkeit
-- 🌬️ Wind & UV-Index
-- ☁️ Bewölkung & Luftdruck
-- 🔋 Batteriestatus
-- ⏰ Datum & Uhrzeit
+**Done!** The display now shows:
 
-## 📊 OpenWeatherMap Sensoren
+- 🌡️ Current temperature & feels like temperature
+- 💧 Humidity
+- 🌬️ Wind & UV index
+- ☁️ Cloud coverage & pressure
+- 🔋 Battery status
+- ⏰ Date & time
 
-Die Konfiguration nutzt automatisch diese Sensoren:
+## 📊 OpenWeatherMap Sensors
+
+The configuration automatically uses these sensors:
 
 ✅ `sensor.openweathermap_temperature`
 ✅ `sensor.openweathermap_feels_like_temperature`
@@ -51,49 +51,49 @@ Die Konfiguration nutzt automatisch diese Sensoren:
 ✅ `sensor.openweathermap_cloud_coverage`
 ✅ `sensor.openweathermap_condition`
 
-**Keine manuelle Anpassung nötig!**
+**No manual adjustment needed!**
 
-## 🎨 Was wird angezeigt?
+## 🎨 What's Displayed?
 
 ```
 ┌─────────────────────────────────────┐
-│      Montag, 28. Januar 2025        │
+│      Monday, January 28, 2025       │
 │             14:30                   │
 ├─────────────────────────────────────┤
 │   [ICON]     23.5°C                 │
-│            Teilweise bewölkt        │
+│         Partly cloudy               │
 ├─────────────────────────────────────┤
-│  Feucht.    Gefühlt   Luftdruck    │
-│   65%       24.2°C    1013 hPa     │
+│  Humidity    Feels     Pressure    │
+│   65%        24.2°C    1013 hPa    │
 │                                     │
 │   Wind: 12 km/h      UV: 3.2       │
-│       Bewölkung: 45%                │
+│       Cloudiness: 45%               │
 ├─────────────────────────────────────┤
-│ Batterie 85%     WiFi: OK  14:30   │
+│ Battery 85%     WiFi: OK  14:30    │
 └─────────────────────────────────────┘
 ```
 
-## 🔧 Anpassungen
+## 🔧 Customizations
 
-### Zeitzone ändern
+### Change Timezone
 
-In [m5stack-papers3-weather.yaml](m5stack-papers3-weather.yaml) Zeile ~176:
-
-```yaml
-timezone: Europe/Berlin  # ← Deine Zeitzone
-```
-
-### Update-Intervall
-
-Zeile ~234:
+In [m5stack-papers3-weather.yaml](m5stack-papers3-weather.yaml) line ~176:
 
 ```yaml
-interval: 6h  # ← z.B. 1h, 30min, 15min
+timezone: Europe/Berlin  # ← Your timezone
 ```
 
-### Deep Sleep (Batterie-Sparmodus)
+### Update Interval
 
-Am Ende der YAML-Datei hinzufügen:
+Line ~234:
+
+```yaml
+interval: 6h  # ← e.g., 1h, 30min, 15min
+```
+
+### Deep Sleep (Battery Saving)
+
+Add at the end of YAML file:
 
 ```yaml
 deep_sleep:
@@ -101,40 +101,36 @@ deep_sleep:
   sleep_duration: 30min
 ```
 
-**Batterie-Laufzeit:**
-- Normal (6h Updates): ~2-3 Tage
-- Deep Sleep (30min): ~2-3 Wochen
-- Deep Sleep (1h): ~4-6 Wochen
+**Battery Life:**
 
-## 📚 Dokumentation
+- Normal (6h updates): ~2-3 days
+- Deep Sleep (30min): ~2-3 weeks
+- Deep Sleep (1h): ~4-6 weeks
 
-📖 **Detaillierte Anleitungen:**
+## 📚 Documentation
+
+📖 **Detailed Guides:**
 
 1. **[OPENWEATHERMAP_SETUP.md](OPENWEATHERMAP_SETUP.md)** ⭐
-   - Speziell für deine OpenWeatherMap Integration
-   - Alle verfügbaren Sensoren erklärt
-   - Erweiterte Konfigurationen
+   - Specifically for your OpenWeatherMap integration
+   - All available sensors explained
+   - Advanced configurations
 
-2. **[WEATHER_QUICKSTART.md](WEATHER_QUICKSTART.md)**
-   - 5-Minuten Schnellstart
-   - Copy & Paste Commands
-   - Häufigste Anpassungen
-
-3. **[WEATHER_DISPLAY_GUIDE.md](WEATHER_DISPLAY_GUIDE.md)**
-   - Vollständige Anleitung
-   - Custom Icons
-   - Home Assistant Automationen
-   - Fehlerbehebung
+2. **[WEATHER_DISPLAY_GUIDE.md](WEATHER_DISPLAY_GUIDE.md)**
+   - Complete guide
+   - Custom icons
+   - Home Assistant automations
+   - Troubleshooting
 
 ## 🏠 Home Assistant Integration
 
-### Service: Display aktualisieren
+### Service: Update Display
 
 ```yaml
 service: esphome.m5papers3_weather_update_display
 ```
 
-### Service: Ton abspielen
+### Service: Play Tone
 
 ```yaml
 service: esphome.m5papers3_weather_play_tone
@@ -142,7 +138,7 @@ data:
   rtttl_string: "beep:d=4,o=5,b=100:16e6"
 ```
 
-### Automation: Bei Wetteränderung
+### Automation: On Weather Change
 
 ```yaml
 automation:
@@ -156,69 +152,72 @@ automation:
 
 ## 🎯 Features
 
-- ✅ **Automatische Icon-Auswahl** basierend auf Wetterbedingung
-- ✅ **Echtzeit-Updates** von Home Assistant
-- ✅ **Touch-Steuerung** (Tippen = Aktualisieren)
-- ✅ **Batterie-Anzeige** mit Prozent & Ladestatus
-- ✅ **RTC-Synchronisation** (Zeit läuft auch ohne WiFi)
-- ✅ **WiFi Power-Save** für längere Akkulaufzeit
-- ✅ **Services** für Home Assistant Integration
-- ✅ **4 Schriftgrößen** für optimale Lesbarkeit
+- ✅ **Automatic icon selection** based on weather condition
+- ✅ **Real-time updates** from Home Assistant
+- ✅ **Touch control** (tap = refresh)
+- ✅ **Battery display** with percentage & charging status
+- ✅ **RTC synchronization** (time runs even without WiFi)
+- ✅ **WiFi power save** for longer battery life
+- ✅ **Services** for Home Assistant integration
+- ✅ **4 font sizes** for optimal readability
 
-## 🐛 Probleme?
+## 🐛 Problems?
 
-**Display zeigt nichts:**
+**Display shows nothing:**
+
 ```bash
 esphome logs m5stack-papers3-weather.yaml
 ```
 
-**Icons fehlen:**
+**Icons missing:**
+
 ```bash
 cd /c/Users/btrom/source/repos/epdiy/scripts
 python download_weather_icons.py
 copy ..\weather_icons.h ..\..\esphome_components\
 ```
 
-**Keine Verbindung zu HA:**
-- Prüfe `secrets.yaml`
-- WiFi-Status im Log checken
+**No connection to HA:**
 
-**Vollständige Fehlerbehebung:** Siehe [OPENWEATHERMAP_SETUP.md](OPENWEATHERMAP_SETUP.md)
+- Check `secrets.yaml`
+- Check WiFi status in logs
 
-## 💡 Tipps
+**Complete troubleshooting:** See [OPENWEATHERMAP_SETUP.md](OPENWEATHERMAP_SETUP.md)
 
-1. **Teste zuerst** mit Standard-Einstellungen
-2. **Update-Intervall** auf 6h lassen (schont Batterie & Display)
-3. **Deep Sleep** nur aktivieren wenn alles funktioniert
-4. **Vorhersage** kann später hinzugefügt werden
-5. **Custom Icons** sind optional
+## 💡 Tips
+
+1. **Test first** with default settings
+2. **Update interval** keep at 6h (saves battery & display)
+3. **Deep Sleep** only enable when everything works
+4. **Forecast** can be added later
+5. **Custom Icons** are optional
 
 ## 🚀 Next Steps
 
-Nach dem Setup kannst du erweitern mit:
+After setup you can extend with:
 
-- [ ] 3-Tages-Vorhersage
-- [ ] Temperatur-Graph
-- [ ] Unwetter-Warnungen
-- [ ] Mehrere Standorte
-- [ ] Custom Icons/Logos
-- [ ] Touch-Menü
+- [ ] 3-day forecast
+- [ ] Temperature graph
+- [ ] Severe weather warnings
+- [ ] Multiple locations
+- [ ] Custom icons/logos
+- [ ] Touch menu
 
-## 📖 Zusätzliche Ressourcen
+## 📖 Additional Resources
 
 - [EPDiy GitHub](https://github.com/vroland/epdiy)
-- [ESPHome Dokumentation](https://esphome.io/)
+- [ESPHome Documentation](https://esphome.io/)
 - [M5Stack PaperS3](https://docs.m5stack.com/en/core/PaperS3)
 - [OpenWeatherMap Integration](https://www.home-assistant.io/integrations/openweathermap/)
 
-## 📝 Lizenz
+## 📝 License
 
-MIT License - Frei verwendbar für private und kommerzielle Zwecke.
+MIT License - Free for personal and commercial use.
 
 ---
 
-**Erstellt mit:** EPDiy + ESPHome + Home Assistant + OpenWeatherMap
+**Built with:** EPDiy + ESPHome + Home Assistant + OpenWeatherMap
 
 **Hardware:** M5Stack PaperS3 (ESP32-S3, 4.7" E-Ink)
 
-**Viel Spaß mit deinem Wetter-Display!** 🌤️
+**Enjoy your weather display!** 🌤️

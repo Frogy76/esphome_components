@@ -1,53 +1,53 @@
 # ☀️ M5Paper OpenWeatherMap Display - Setup
 
-Deine Konfiguration ist bereits für OpenWeatherMap optimiert!
+Your configuration is already optimized for OpenWeatherMap!
 
-## ✅ Was angezeigt wird
+## ✅ What's Displayed
 
 ```
 ┌─────────────────────────────────────┐
-│      Montag, 28. Januar 2025        │
+│      Monday, January 28, 2025       │
 │             14:30                   │
 ├─────────────────────────────────────┤
 │                                     │
 │   ☁️        23.5°C                  │
-│           Wolkig                    │
+│            Cloudy                   │
 │                                     │
 ├─────────────────────────────────────┤
-│  Feucht.    Gefühlt   Luftdruck    │
-│   65%       24.2°C    1013 hPa     │
+│  Humidity    Feels     Pressure    │
+│   65%        24.2°C    1013 hPa    │
 │                                     │
-│   Wind: 12.5 km/h    UV: 3.2       │
-│       Bewölkung: 45%                │
+│   Wind: 12.5 km/h     UV: 3.2      │
+│       Cloudiness: 45%               │
 ├─────────────────────────────────────┤
-│ Batterie 4.1V  WiFi: OK  14:30     │
+│ Battery 4.1V  WiFi: OK  14:30      │
 │ 85%                    CPU: 42°C   │
 └─────────────────────────────────────┘
 ```
 
-## 📊 OpenWeatherMap Sensoren (verwendet)
+## 📊 OpenWeatherMap Sensors (Used)
 
-Deine Konfiguration nutzt folgende Sensoren:
+Your configuration uses these sensors:
 
-✅ `sensor.openweathermap_temperature` - Haupttemperatur
-✅ `sensor.openweathermap_feels_like_temperature` - Gefühlte Temperatur
-✅ `sensor.openweathermap_humidity` - Luftfeuchtigkeit
-✅ `sensor.openweathermap_pressure` - Luftdruck
-✅ `sensor.openweathermap_wind_speed` - Windgeschwindigkeit
-✅ `sensor.openweathermap_uv_index` - UV-Index
-✅ `sensor.openweathermap_cloud_coverage` - Bewölkung
-✅ `sensor.openweathermap_condition` - Wetterzustand (für Icon)
+✅ `sensor.openweathermap_temperature` - Main temperature
+✅ `sensor.openweathermap_feels_like_temperature` - Feels like temperature
+✅ `sensor.openweathermap_humidity` - Humidity
+✅ `sensor.openweathermap_pressure` - Pressure
+✅ `sensor.openweathermap_wind_speed` - Wind speed
+✅ `sensor.openweathermap_uv_index` - UV index
+✅ `sensor.openweathermap_cloud_coverage` - Cloud coverage
+✅ `sensor.openweathermap_condition` - Weather condition (for icon)
 
-**Zusätzlich verfügbar (nicht verwendet):**
-- `sensor.openweathermap_wind_gust` - Windböen
-- `sensor.openweathermap_visibility` - Sichtweite
-- `sensor.openweathermap_dew_point` - Taupunkt
-- `sensor.openweathermap_rain` - Regenintensität
-- `sensor.openweathermap_snow` - Schneeintensität
+**Additionally available (not used):**
+- `sensor.openweathermap_wind_gust` - Wind gusts
+- `sensor.openweathermap_visibility` - Visibility
+- `sensor.openweathermap_dew_point` - Dew point
+- `sensor.openweathermap_rain` - Rain intensity
+- `sensor.openweathermap_snow` - Snow intensity
 
-## 🚀 Schnellstart
+## 🚀 Quick Start
 
-### 1. Icons generieren
+### 1. Generate Icons
 
 ```bash
 cd /c/Users/btrom/source/repos/epdiy/scripts
@@ -55,98 +55,100 @@ python download_weather_icons.py
 copy ..\weather_icons.h ..\..\esphome_components\
 ```
 
-### 2. Secrets-Datei erstellen
+### 2. Create Secrets File
 
-Erstelle `esphome_components/secrets.yaml`:
+Create `esphome_components/secrets.yaml`:
 
 ```yaml
-wifi_ssid: "DeinWiFi"
-wifi_password: "DeinPasswort"
+wifi_ssid: "YourWiFi"
+wifi_password: "YourPassword"
 ```
 
-### 3. Flashen!
+### 3. Flash!
 
 ```bash
 cd /c/Users/btrom/source/repos/esphome_components
 esphome run m5stack-papers3-weather.yaml
 ```
 
-**Das war's!** Alle OpenWeatherMap Sensoren sind bereits konfiguriert.
+**That's it!** All OpenWeatherMap sensors are already configured.
 
-## 🎨 Anpassungen
+## 🎨 Customizations
 
-### Zeitzone ändern
+### Change Timezone
 
-Zeile ~176 in `m5stack-papers3-weather.yaml`:
+Line ~176 in `m5stack-papers3-weather.yaml`:
 
 ```yaml
 time:
   - platform: homeassistant
-    timezone: Europe/Berlin  # ← ANPASSEN
+    timezone: Europe/Berlin  # ← ADJUST HERE
 ```
 
-**Beliebte Zeitzonen:**
+**Popular Timezones:**
 - `Europe/Berlin`
-- `Europe/Vienna` (Österreich)
-- `Europe/Zurich` (Schweiz)
-- `Europe/Paris` (Frankreich)
-- `Europe/Amsterdam` (Niederlande)
+- `Europe/Vienna` (Austria)
+- `Europe/Zurich` (Switzerland)
+- `Europe/Paris` (France)
+- `Europe/Amsterdam` (Netherlands)
+- `America/New_York`
+- `America/Los_Angeles`
 
-### Update-Intervall ändern
+### Change Update Interval
 
-Zeile ~234:
+Line ~234:
 
 ```yaml
 interval:
-  - interval: 6h  # ← z.B. zu 1h, 30min, 15min ändern
+  - interval: 6h  # ← e.g., change to 1h, 30min, 15min
     then:
       - component.update: weather_display
 ```
 
-**Empfehlungen:**
-- **6h**: Normaler Betrieb, beste Batterie-Laufzeit
-- **1h**: Häufigere Updates, gute Balance
-- **15min**: Sehr aktuell, höherer Stromverbrauch
+**Recommendations:**
+- **6h**: Normal operation, best battery life
+- **1h**: More frequent updates, good balance
+- **15min**: Very current, higher power consumption
 
-### Weitere Sensoren hinzufügen
+### Add More Sensors
 
-#### Sichtweite anzeigen
+#### Display Visibility
 
-In der Sensor-Sektion ist bereits `weather_visibility` definiert.
-Füge im Display-Lambda hinzu:
+`weather_visibility` is already defined in the sensor section.
+Add to display lambda:
 
 ```yaml
-// Nach Bewölkung (Zeile ~440)
+// After cloudiness (line ~440)
 if (id(weather_visibility).has_state()) {
   it.printf(SCREEN_W/2, extra_y+80, id(font_small), TextAlign::TOP_CENTER,
-            "Sicht: %.1f km", id(weather_visibility).state);
+            "Visibility: %.1f km", id(weather_visibility).state);
 }
 ```
 
-#### Taupunkt anzeigen
+#### Display Dew Point
 
-Sensor hinzufügen:
+Add sensor:
 
 ```yaml
 sensor:
-  # ... bestehende Sensoren ...
+  # ... existing sensors ...
   - platform: homeassistant
     id: weather_dew_point
     entity_id: sensor.openweathermap_dew_point
 ```
 
-Im Display:
+In display:
 
 ```yaml
 if (id(weather_dew_point).has_state()) {
-  it.printf(100, 500, id(font_small), "Taupunkt: %.1f°C",
+  it.printf(100, 500, id(font_small), "Dew Point: %.1f°C",
             id(weather_dew_point).state);
 }
 ```
 
-#### Regenintensität anzeigen
+#### Display Rain Intensity
 
-Sensor hinzufügen:
+Add sensor:
 
 ```yaml
 sensor:
@@ -155,41 +157,41 @@ sensor:
     entity_id: sensor.openweathermap_rain
 ```
 
-Im Display (nur bei Regen):
+In display (only when raining):
 
 ```yaml
 if (id(weather_rain).has_state() && id(weather_rain).state > 0) {
   it.printf(SCREEN_W/2, 820, id(font_medium), TextAlign::TOP_CENTER,
-            "Regen: %.1f mm/h", id(weather_rain).state);
+            "Rain: %.1f mm/h", id(weather_rain).state);
 }
 ```
 
-## 🌡️ Wetter-Bedingungen & Icons
+## 🌡️ Weather Conditions & Icons
 
-OpenWeatherMap liefert diese Bedingungen (bereits im Code unterstützt):
+OpenWeatherMap provides these conditions (already supported in code):
 
-| Bedingung | Icon | Beschreibung |
-|-----------|------|--------------|
-| `sunny` / `clear` | ☀️ | Sonnig/Klar |
-| `cloudy` | ☁️ | Bewölkt |
-| `partlycloudy` | ⛅ | Teilweise bewölkt |
-| `rainy` / `rain` | 🌧️ | Regen |
-| `pouring` | ⛈️ | Starkregen |
-| `snowy` / `snow` | ❄️ | Schnee |
-| `fog` / `foggy` | 🌫️ | Nebel |
-| `lightning` | ⚡ | Gewitter |
+| Condition | Icon | Description |
+|-----------|------|-------------|
+| `sunny` / `clear` | ☀️ | Sunny/Clear |
+| `cloudy` | ☁️ | Cloudy |
+| `partlycloudy` | ⛅ | Partly cloudy |
+| `rainy` / `rain` | 🌧️ | Rain |
+| `pouring` | ⛈️ | Heavy rain |
+| `snowy` / `snow` | ❄️ | Snow |
+| `fog` / `foggy` | 🌫️ | Fog |
+| `lightning` | ⚡ | Lightning |
 
-## 🔋 Batterie-Optimierung
+## 🔋 Battery Optimization
 
-### Deep Sleep aktivieren
+### Enable Deep Sleep
 
-Füge am Ende der YAML-Datei hinzu:
+Add at the end of YAML file:
 
 ```yaml
 deep_sleep:
   id: deep_sleep_control
   run_duration: 10s
-  sleep_duration: 30min  # Wacht alle 30 Min auf
+  sleep_duration: 30min  # Wake up every 30 min
 
 esphome:
   on_boot:
@@ -199,30 +201,30 @@ esphome:
       - deep_sleep.enter: deep_sleep_control
 ```
 
-**Batterie-Laufzeit:**
-- **Ohne Deep Sleep**: ~2-3 Tage (mit 6h Updates)
-- **Mit Deep Sleep (30min)**: ~2-3 Wochen
-- **Mit Deep Sleep (1h)**: ~4-6 Wochen
+**Battery Life:**
+- **Without Deep Sleep**: ~2-3 days (with 6h updates)
+- **With Deep Sleep (30min)**: ~2-3 weeks
+- **With Deep Sleep (1h)**: ~4-6 weeks
 
-⚠️ **Achtung:** Im Deep Sleep sind keine OTA-Updates möglich!
+⚠️ **Warning:** OTA updates are not possible in deep sleep mode!
 
-### WiFi Power-Save
+### WiFi Power Save
 
-Bereits aktiviert in Zeile ~68:
+Already enabled at line ~68:
 
 ```yaml
 wifi:
   power_save_mode: LIGHT
 ```
 
-## 🏠 Home Assistant Automationen
+## 🏠 Home Assistant Automations
 
-### Automatisches Update bei Wetteränderung
+### Automatic Update on Weather Change
 
 ```yaml
 # In Home Assistant: automations.yaml
 automation:
-  - alias: "M5Paper: Update bei Wetteränderung"
+  - alias: "M5Paper: Update on Weather Change"
     trigger:
       - platform: state
         entity_id: sensor.openweathermap_condition
@@ -230,11 +232,11 @@ automation:
       - service: esphome.m5papers3_weather_update_display
 ```
 
-### Warnung bei hohem UV-Index
+### Warning on High UV Index
 
 ```yaml
 automation:
-  - alias: "M5Paper: UV-Warnung"
+  - alias: "M5Paper: UV Warning"
     trigger:
       - platform: numeric_state
         entity_id: sensor.openweathermap_uv_index
@@ -245,9 +247,9 @@ automation:
           rtttl_string: "uv_warning:d=4,o=5,b=140:16c6,16p,16c6,16p,16c6"
 ```
 
-### Tägliches Voll-Refresh (gegen Ghosting)
+### Daily Full Refresh (Anti-Ghosting)
 
-Bereits eingebaut! Zeile ~234:
+Already built-in! Line ~234:
 
 ```yaml
 interval:
@@ -258,11 +260,11 @@ interval:
 
 ## 📱 ESPHome Services
 
-Das Display bietet diese Services in Home Assistant:
+The display provides these services in Home Assistant:
 
 ### `esphome.m5papers3_weather_update_display`
 
-Aktualisiert das Display sofort.
+Updates the display immediately.
 
 ```yaml
 service: esphome.m5papers3_weather_update_display
@@ -270,7 +272,7 @@ service: esphome.m5papers3_weather_update_display
 
 ### `esphome.m5papers3_weather_play_tone`
 
-Spielt einen Signalton.
+Plays a tone.
 
 ```yaml
 service: esphome.m5papers3_weather_play_tone
@@ -278,18 +280,18 @@ data:
   rtttl_string: "beep:d=4,o=5,b=100:16e6,16e6"
 ```
 
-## 🎯 Erweiterte Layouts
+## 🎯 Advanced Layouts
 
-### Vorhersage für morgen anzeigen
+### Display Tomorrow's Forecast
 
-Die Forecast-Sensoren sind bereits definiert (Zeile ~154-162).
+Forecast sensors are already defined (line ~154-162).
 
-Im Display hinzufügen:
+Add to display:
 
 ```yaml
-// Vorhersage-Bereich
+// Forecast section
 if (id(weather_forecast_0).has_state()) {
-  it.printf(100, 820, id(font_medium), "Morgen:");
+  it.printf(100, 820, id(font_medium), "Tomorrow:");
   it.printf(100, 860, id(font_small), "%s",
             id(weather_forecast_0).state.c_str());
 
@@ -300,17 +302,17 @@ if (id(weather_forecast_0).has_state()) {
 }
 ```
 
-### Windböen anzeigen
+### Display Wind Gusts
 
 ```yaml
-// Wind mit Böen
+// Wind with gusts
 if (id(weather_wind_speed).has_state()) {
   std::string wind_text = "Wind: " +
                           to_string((int)id(weather_wind_speed).state) +
                           " km/h";
 
   if (id(weather_wind_gust).has_state()) {
-    wind_text += " (Böen: " +
+    wind_text += " (Gusts: " +
                  to_string((int)id(weather_wind_gust).state) +
                  ")";
   }
@@ -320,74 +322,74 @@ if (id(weather_wind_speed).has_state()) {
 }
 ```
 
-## 🐛 Fehlerbehebung
+## 🐛 Troubleshooting
 
-### Display zeigt "unavailable"
+### Display Shows "unavailable"
 
-**Grund:** Home Assistant ist nicht verbunden oder Sensor existiert nicht.
+**Reason:** Home Assistant not connected or sensor doesn't exist.
 
-**Lösung:**
-1. Prüfe WiFi-Verbindung
-2. Logs anschauen:
+**Solution:**
+1. Check WiFi connection
+2. View logs:
    ```bash
    esphome logs m5stack-papers3-weather.yaml
    ```
-3. In Home Assistant: Entwicklerwerkzeuge → Zustände
-   - Sind alle OpenWeatherMap Sensoren verfügbar?
+3. In Home Assistant: Developer Tools → States
+   - Are all OpenWeatherMap sensors available?
 
-### Icons werden nicht angezeigt
+### Icons Not Displayed
 
-1. **Header-Datei kopiert?**
+1. **Header file copied?**
    ```bash
    dir c:\Users\btrom\source\repos\esphome_components\weather_icons.h
    ```
 
-2. **Neu kompilieren:**
+2. **Recompile:**
    ```bash
    esphome clean m5stack-papers3-weather.yaml
    esphome compile m5stack-papers3-weather.yaml
    ```
 
-### Falsche Zeitzone
+### Wrong Timezone
 
-Zeile ~176 anpassen:
+Adjust line ~176:
 
 ```yaml
 time:
   - platform: homeassistant
-    timezone: Europe/Berlin  # ← HIER ÄNDERN
+    timezone: Europe/Berlin  # ← CHANGE HERE
 ```
 
-### Batterie entlädt sich zu schnell
+### Battery Drains Too Fast
 
-1. **Update-Intervall erhöhen** (Zeile ~234):
+1. **Increase update interval** (line ~234):
    ```yaml
-   interval: 6h  # statt z.B. 15min
+   interval: 6h  # instead of e.g., 15min
    ```
 
-2. **Deep Sleep aktivieren** (siehe oben)
+2. **Enable Deep Sleep** (see above)
 
-3. **WiFi Power-Save prüfen** (Zeile ~68):
+3. **Check WiFi Power Save** (line ~68):
    ```yaml
    wifi:
-     power_save_mode: LIGHT  # oder HIGH
+     power_save_mode: LIGHT  # or HIGH
    ```
 
-## 📚 Nächste Schritte
+## 📚 Next Steps
 
-- [ ] Teste die Grund-Konfiguration
-- [ ] Passe Zeitzone an
-- [ ] Probiere verschiedene Update-Intervalle
-- [ ] Füge Vorhersage hinzu
-- [ ] Aktiviere Deep Sleep für lange Laufzeit
-- [ ] Erstelle Home Assistant Automationen
+- [ ] Test basic configuration
+- [ ] Adjust timezone
+- [ ] Try different update intervals
+- [ ] Add forecast
+- [ ] Enable deep sleep for long runtime
+- [ ] Create Home Assistant automations
 
-**Viel Erfolg mit deinem Wetter-Display!** 🌤️
+**Enjoy your weather display!** 🌤️
 
 ---
 
-**Weitere Hilfe:**
-- [Vollständige Anleitung](WEATHER_DISPLAY_GUIDE.md)
-- [Schnellstart](WEATHER_QUICKSTART.md)
-- [ESPHome Dokumentation](https://esphome.io/)
+**More Help:**
+- [Complete Guide](WEATHER_DISPLAY_GUIDE.md)
+- [Quick Start](README_WEATHER.md)
+- [ESPHome Documentation](https://esphome.io/)
 - [OpenWeatherMap Integration](https://www.home-assistant.io/integrations/openweathermap/)

@@ -6,8 +6,8 @@ esphome:
     build_flags: "-DBOARD_HAS_PSRAM"
   libraries:
     - EPDIY=https://github.com/Frogy76/epdiy
-  includes:
-    - weather_icons.h  # Generated weather icons
+  # includes:
+  #   - weather_icons.h  # TODO: Icons als ESPHome Image-Komponenten implementieren
   on_boot:
     priority: -100
     then:
@@ -238,7 +238,7 @@ rtttl:
 
 touchscreen:
   platform: gt911
-  id: touchscreen
+  id: touch_panel
   interrupt_pin: GPIO48
   transform:
     mirror_x: true
@@ -308,57 +308,58 @@ display:
       // ========================================
       // WETTER-ICON AUSWAHL
       // ========================================
-      const uint8_t* weather_icon = nullptr;
-      uint32_t icon_width = 128;
-      uint32_t icon_height = 128;
+      // TODO: Icons als ESPHome Image-Komponenten definieren
+      // const uint8_t* weather_icon = nullptr;
+      // uint32_t icon_width = 128;
+      // uint32_t icon_height = 128;
 
       std::string condition = id(weather_condition).state;
 
-      if (condition == "sunny" || condition == "clear") {
-        weather_icon = weather_sunny_data;
-        icon_width = weather_sunny_width;
-        icon_height = weather_sunny_height;
-      }
-      else if (condition == "cloudy") {
-        weather_icon = weather_cloudy_data;
-        icon_width = weather_cloudy_width;
-        icon_height = weather_cloudy_height;
-      }
-      else if (condition == "partlycloudy") {
-        weather_icon = weather_partlycloudy_data;
-        icon_width = weather_partlycloudy_width;
-        icon_height = weather_partlycloudy_height;
-      }
-      else if (condition == "rainy" || condition == "rain") {
-        weather_icon = weather_rainy_data;
-        icon_width = weather_rainy_width;
-        icon_height = weather_rainy_height;
-      }
-      else if (condition == "pouring") {
-        weather_icon = weather_pouring_data;
-        icon_width = weather_pouring_width;
-        icon_height = weather_pouring_height;
-      }
-      else if (condition == "snowy" || condition == "snow") {
-        weather_icon = weather_snowy_data;
-        icon_width = weather_snowy_width;
-        icon_height = weather_snowy_height;
-      }
-      else if (condition == "fog" || condition == "foggy") {
-        weather_icon = weather_fog_data;
-        icon_width = weather_fog_width;
-        icon_height = weather_fog_height;
-      }
-      else if (condition == "lightning" || condition == "lightning-rainy") {
-        weather_icon = weather_lightning_data;
-        icon_width = weather_lightning_width;
-        icon_height = weather_lightning_height;
-      }
+      // if (condition == "sunny" || condition == "clear") {
+      //   weather_icon = weather_sunny_data;
+      //   icon_width = weather_sunny_width;
+      //   icon_height = weather_sunny_height;
+      // }
+      // else if (condition == "cloudy") {
+      //   weather_icon = weather_cloudy_data;
+      //   icon_width = weather_cloudy_width;
+      //   icon_height = weather_cloudy_height;
+      // }
+      // else if (condition == "partlycloudy") {
+      //   weather_icon = weather_partlycloudy_data;
+      //   icon_width = weather_partlycloudy_width;
+      //   icon_height = weather_partlycloudy_height;
+      // }
+      // else if (condition == "rainy" || condition == "rain") {
+      //   weather_icon = weather_rainy_data;
+      //   icon_width = weather_rainy_width;
+      //   icon_height = weather_rainy_height;
+      // }
+      // else if (condition == "pouring") {
+      //   weather_icon = weather_pouring_data;
+      //   icon_width = weather_pouring_width;
+      //   icon_height = weather_pouring_height;
+      // }
+      // else if (condition == "snowy" || condition == "snow") {
+      //   weather_icon = weather_snowy_data;
+      //   icon_width = weather_snowy_width;
+      //   icon_height = weather_snowy_height;
+      // }
+      // else if (condition == "fog" || condition == "foggy") {
+      //   weather_icon = weather_fog_data;
+      //   icon_width = weather_fog_width;
+      //   icon_height = weather_fog_height;
+      // }
+      // else if (condition == "lightning" || condition == "lightning-rainy") {
+      //   weather_icon = weather_lightning_data;
+      //   icon_width = weather_lightning_width;
+      //   icon_height = weather_lightning_height;
+      // }
 
       // ========================================
       // KOPFZEILE: DATUM & ZEIT
       // ========================================
-      it.strftime(SCREEN_W/2, 30, id(font_medium), TextAlign::TOP_CENTER,
+      it.strftime(SCREEN_W/2, 30, id(font_small), TextAlign::TOP_CENTER,
                   "%A, %d. %B %Y", id(rtc_time).now());
 
       it.strftime(SCREEN_W/2, 85, id(font_large), TextAlign::TOP_CENTER,
@@ -371,10 +372,11 @@ display:
       // HAUPTBEREICH: TEMPERATUR & ICON
       // ========================================
 
-      // Wetter-Icon (links)
-      if (weather_icon != nullptr) {
-        it.image(60, 260, id(weather_icon));
-      }
+      // Wetter-Icon (links) - TODO: Icons müssen als ESPHome Image-Komponenten definiert werden
+      // Die Rohdaten können nicht direkt mit it.image() verwendet werden
+      // if (weather_icon != nullptr) {
+      //   it.image(60, 260, weather_icon, icon_width, icon_height);
+      // }
 
       // Haupttemperatur (rechts vom Icon)
       if (id(weather_temperature).has_state()) {
@@ -403,7 +405,7 @@ display:
 
       // Spalte 2: Gefühlte Temperatur
       it.printf(SCREEN_W/2, details_y, id(font_small), TextAlign::TOP_CENTER,
-                "Gefühlt");
+                "Gefuehlt");
       if (id(weather_feels_like).has_state()) {
         it.printf(SCREEN_W/2, details_y+40, id(font_medium), TextAlign::TOP_CENTER,
                   "%.1f°C", id(weather_feels_like).state);
@@ -439,7 +441,7 @@ display:
       // Bewölkung
       if (id(weather_cloud_coverage).has_state()) {
         it.printf(SCREEN_W/2, extra_y+40, id(font_small), TextAlign::TOP_CENTER,
-                  "Bewölkung: %.0f%%", id(weather_cloud_coverage).state);
+                  "Bewoelkung: %.0f%%", id(weather_cloud_coverage).state);
       }
 
       // ========================================
@@ -466,8 +468,7 @@ display:
 
       // WiFi-Status
       it.printf(SCREEN_W/2, footer_y, id(font_tiny), TextAlign::BOTTOM_CENTER,
-                "WiFi: %s",
-                id(wifi_id).is_connected() ? "Verbunden" : "Getrennt");
+                "WiFi: Verbunden");
 
       // Letzte Aktualisierung
       it.strftime(SCREEN_W-40, footer_y, id(font_tiny), TextAlign::BOTTOM_RIGHT,

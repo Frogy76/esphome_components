@@ -2,15 +2,37 @@
 
 Custom ESPHome components for M5Stack devices and peripherals.
 
+## 🌤️ Weather Display for M5Stack PaperS3
+
+Ready-to-use weather display configuration with OpenWeatherMap integration!
+
+**Quick Start:**
+
+```bash
+cd /c/Users/btrom/source/repos/epdiy/scripts
+python download_weather_icons.py
+copy ..\weather_icons.h ..\..\esphome_components\
+cd /c/Users/btrom/source/repos/esphome_components
+esphome run m5stack-papers3-weather.yaml
+```
+
+**Documentation:**
+
+- 📖 [Quick Start Guide](README_WEATHER.md) - 2-minute setup
+- ⭐ [OpenWeatherMap Setup](OPENWEATHERMAP_SETUP.md) - Complete configuration guide
+- 🔧 [Advanced Guide](WEATHER_DISPLAY_GUIDE.md) - Customizations & troubleshooting
+
 ## Supported Devices
 
 ### M5Stack StamPLC
+
 - **aw9523** - I/O expander
 - **pi4ioe5v6408** - I/O expander
 - **rx8130ce** - Real-time clock
 - **lm75** - Temperature sensor
 
 ### M5Stack PaperS3
+
 - **ed047tc1** - E-Ink display driver (uses [epdiy](https://github.com/vroland/epdiy) library)
 - **bmi270** - 6-axis IMU sensor (accelerometer + gyroscope)
 
