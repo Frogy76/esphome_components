@@ -1,4 +1,5 @@
 #include "bmi270.h"
+#include "bmi270_config.h"
 #include "esphome/core/log.h"
 
 namespace esphome {
@@ -6,9 +7,109 @@ namespace bmi270 {
 
 static const char *const TAG = "bmi270";
 
+// BMI270 Register addresses
+#define BMI2_CHIP_ID_ADDR 0x00
+#define BMI2_PWR_CONF_ADDR 0x7C
+#define BMI2_PWR_CTRL_ADDR 0x7D
+#define BMI2_INIT_CTRL_ADDR 0x59
+#define BMI2_INIT_DATA_ADDR 0x5E
+#define BMI2_ACC_CONF_ADDR 0x40
+#define BMI2_ACC_RANGE_ADDR 0x41
+#define BMI2_GYR_CONF_ADDR 0x42
+#define BMI2_GYR_RANGE_ADDR 0x43
+#define BMI2_ACC_DATA_ADDR 0x0C
+#define BMI2_GYR_DATA_ADDR 0x12
+#define BMI2_INTERNAL_STATUS_ADDR 0x21
+
+#define BMI2_CHIP_ID 0x24
+#define BMI2_INIT_DATA_SIZE sizeof(bmi270_config_file)
+
+// BMI270 API function implementations
+int8_t bmi270_init(bmi2_dev *dev) {
+  uint8_t chip_id;
+  int8_t rslt = dev->read(BMI2_CHIP_ID_ADDR, &chip_id, 1, dev->intf_ptr);
+  if (rslt != BMI2_OK) return rslt;
+
+  if (chip_id != BMI2_CHIP_ID) return BMI2_E_COM_FAIL;
+
+  dev->chip_id = chip_id;
+
+  // Disable advanced power save
+  uint8_t pwr_conf = 0x00;
+  rslt = dev->write(BMI2_PWR_CONF_ADDR, &pwr_conf, 1, dev->intf_ptr);
+  if (rslt != BMI2_OK) return rslt;
+  dev->delay_us(450, dev->intf_ptr);
+
+  // Prepare for config file upload
+  uint8_t init_ctrl = 0x00;
+  rslt = dev->write(BMI2_INIT_CTRL_ADDR, &init_ctrl, 1, dev->intf_ptr);
+  if (rslt != BMI2_OK) return rslt;
+
+  // Upload config file
+  for (uint16_t i = 0; i < BMI2_INIT_DATA_SIZE; i += 32) {
+    uint16_t len = (BMI2_INIT_DATA_SIZE - i) > 32 ? 32 : (BMI2_INIT_DATA_SIZE - i);
+    rslt = dev->write(BMI2_INIT_DATA_ADDR, &bmi270_config_file[i], len, dev->intf_ptr);
+    if (rslt != BMI2_OK) return rslt;
+    dev->delay_us(500, dev->intf_ptr);
+  }
+
+  // Complete config upload
+  init_ctrl = 0x01;
+  rslt = dev->write(BMI2_INIT_CTRL_ADDR, &init_ctrl, 1, dev->intf_ptr);
+  if (rslt != BMI2_OK) return rslt;
+  dev->delay_us(20000, dev->intf_ptr);
+
+  return BMI2_OK;
+}
+
+int8_t bmi270_sensor_enable(const uint8_t *sens_list, uint8_t n_sens, bmi2_dev *dev) {
+  // Enable accelerometer and gyroscope
+  uint8_t pwr_ctrl = 0x0E; // Enable ACC (0x04) + GYR (0x02) + AUX (0x01) = 0x07, but we use 0x0E
+  return dev->write(BMI2_PWR_CTRL_ADDR, &pwr_ctrl, 1, dev->intf_ptr);
+}
+
+int8_t bmi270_set_sensor_config(bmi2_sens_config *sens_cfg, uint8_t n_sens, bmi2_dev *dev) {
+  if (sens_cfg->type == BMI2_ACCEL) {
+    uint8_t acc_conf = sens_cfg->cfg.acc.odr | (sens_cfg->cfg.acc.bw << 4);
+    uint8_t acc_range = sens_cfg->cfg.acc.range;
+    int8_t rslt = dev->write(BMI2_ACC_CONF_ADDR, &acc_conf, 1, dev->intf_ptr);
+    if (rslt != BMI2_OK) return rslt;
+    return dev->write(BMI2_ACC_RANGE_ADDR, &acc_range, 1, dev->intf_ptr);
+  } else if (sens_cfg->type == BMI2_GYRO) {
+    uint8_t gyr_conf = sens_cfg->cfg.gyr.odr | (sens_cfg->cfg.gyr.bw << 4);
+    uint8_t gyr_range = sens_cfg->cfg.gyr.range;
+    int8_t rslt = dev->write(BMI2_GYR_CONF_ADDR, &gyr_conf, 1, dev->intf_ptr);
+    if (rslt != BMI2_OK) return rslt;
+    return dev->write(BMI2_GYR_RANGE_ADDR, &gyr_range, 1, dev->intf_ptr);
+  }
+  return BMI2_OK;
+}
+
+int8_t bmi2_get_sensor_data(bmi2_sensor_data *sensor_data, uint8_t n_sens, bmi2_dev *dev) {
+  uint8_t data[12];
+
+  // Read accelerometer data
+  int8_t rslt = dev->read(BMI2_ACC_DATA_ADDR, data, 6, dev->intf_ptr);
+  if (rslt != BMI2_OK) return rslt;
+
+  sensor_data[0].sens_data.acc.x = (int16_t)(data[0] | (data[1] << 8));
+  sensor_data[0].sens_data.acc.y = (int16_t)(data[2] | (data[3] << 8));
+  sensor_data[0].sens_data.acc.z = (int16_t)(data[4] | (data[5] << 8));
+
+  // Read gyroscope data
+  rslt = dev->read(BMI2_GYR_DATA_ADDR, data, 6, dev->intf_ptr);
+  if (rslt != BMI2_OK) return rslt;
+
+  sensor_data[1].sens_data.gyr.x = (int16_t)(data[0] | (data[1] << 8));
+  sensor_data[1].sens_data.gyr.y = (int16_t)(data[2] | (data[3] << 8));
+  sensor_data[1].sens_data.gyr.z = (int16_t)(data[4] | (data[5] << 8));
+
+  return BMI2_OK;
+}
+
 void BMI270Component::setup() {
   ESP_LOGCONFIG(TAG, "Setting up BMI270...");
-  this->i2c_dev_ = make_unique<esphome::i2c::I2CDevice>(this->i2c_bus_, this->address_);
+  this->i2c_dev_ = make_unique<esphome::i2c::I2CDevice>(this->parent_, this->address_);
   this->i2c_dev_->set_timeout(50);
 
   this->sensor_.intf_ptr = this->i2c_dev_.get();
@@ -39,10 +140,11 @@ void BMI270Component::setup() {
   }
 
   // Configure accelerometer
-  this->accel_cfg_.odr = BMI2_ACC_ODR_100HZ;
-  this->accel_cfg_.range = BMI2_ACC_RANGE_2G;
-  this->accel_cfg_.bw = BMI2_ACC_NORMAL_AVG4;
-  this->accel_cfg_.perf_mode = BMI2_PERF_OPT_MODE;
+  this->accel_cfg_.type = BMI2_ACCEL;
+  this->accel_cfg_.cfg.acc.odr = BMI2_ACC_ODR_100HZ;
+  this->accel_cfg_.cfg.acc.range = BMI2_ACC_RANGE_2G;
+  this->accel_cfg_.cfg.acc.bw = BMI2_ACC_NORMAL_AVG4;
+  this->accel_cfg_.cfg.acc.perf_mode = BMI2_PERF_OPT_MODE;
   rslt = bmi270_set_sensor_config(&this->accel_cfg_, 1, &this->sensor_);
   if (rslt != BMI2_OK) {
     ESP_LOGE(TAG, "Failed to configure accelerometer: %d", rslt);
@@ -51,11 +153,12 @@ void BMI270Component::setup() {
   }
 
   // Configure gyroscope
-  this->gyro_cfg_.odr = BMI2_GYR_ODR_100HZ;
-  this->gyro_cfg_.range = BMI2_GYR_RANGE_2000;
-  this->gyro_cfg_.bw = BMI2_GYR_NORMAL_MODE;
-  this->gyro_cfg_.noise_perf = BMI2_POWER_OPT_MODE;
-  this->gyro_cfg_.filter_perf = BMI2_PERF_OPT_MODE;
+  this->gyro_cfg_.type = BMI2_GYRO;
+  this->gyro_cfg_.cfg.gyr.odr = BMI2_GYR_ODR_100HZ;
+  this->gyro_cfg_.cfg.gyr.range = BMI2_GYR_RANGE_2000;
+  this->gyro_cfg_.cfg.gyr.bw = BMI2_GYR_NORMAL_MODE;
+  this->gyro_cfg_.cfg.gyr.noise_perf = BMI2_POWER_OPT_MODE;
+  this->gyro_cfg_.cfg.gyr.filter_perf = BMI2_PERF_OPT_MODE;
   rslt = bmi270_set_sensor_config(&this->gyro_cfg_, 1, &this->sensor_);
   if (rslt != BMI2_OK) {
     ESP_LOGE(TAG, "Failed to configure gyroscope: %d", rslt);
@@ -101,6 +204,10 @@ void BMI270Component::dump_config() {
   if (this->is_failed()) {
     ESP_LOGE(TAG, "BMI270 communication failed");
   }
+}
+
+float BMI270Component::get_setup_priority() const {
+  return setup_priority::DATA;
 }
 
 int8_t BMI270Component::read_bytes(uint8_t reg_addr, uint8_t *data, uint32_t len, void *intf_ptr) {
